@@ -129,6 +129,10 @@
     <p id="firestore">Firestore</p>
 
     <script>
+      import { getAuth } from "firebase/auth";
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const token = user ? await user.getIdToken() : null;
       document.addEventListener("DOMContentLoaded", function () {
         const loadEl = document.querySelector("#load");
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥 🔥🔥🔥
@@ -163,7 +167,12 @@
           loadEl.textContent = `Firebase SDK loaded with ${features.join(", ")}`;
 
           const firestoreEl = document.querySelector("#firestore");
-          fetch("https://task-api-108536250944.us-central1.run.app/tasks")
+          fetch("https://task-api-108536250944.us-central1.run.app/tasks", {
+            headers: {
+              "Authorization": `Bearer ${token}`, // Replace with your actual token if needed
+              method: "GET"
+            }
+          })
             .then((response) => response.json())
             .then((data) => {
               firestoreEl.textContent = `Firestore: ${data.length} tasks found`;
