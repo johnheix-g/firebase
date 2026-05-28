@@ -163,24 +163,16 @@
           loadEl.textContent = `Firebase SDK loaded with ${features.join(", ")}`;
 
           const firestoreEl = document.querySelector("#firestore");
-          if (features.includes("firestore")) {
-            app
-              .firestore()
-              .collection("test")
-              .doc("test")
-              .set({ hello: "world" })
-              .then(() => {
-                firestoreEl.textContent =
-                  "Firestore: Document successfully written!";
-              })
-              .catch((error) => {
-                console.error(error);
-                firestoreEl.textContent =
-                  "Firestore: Error writing document, check the console.";
-              });
-          } else {
-            firestoreEl.textContent = "Firestore: Not Available";
-          }
+          fetch("https://task-api-108536250944.us-central1.run.app/tasks")
+            .then((response) => response.json())
+            .then((data) => {
+              firestoreEl.textContent = `Firestore: ${data.length} tasks found`;
+            })
+            .catch((error) => {
+              console.error(error);
+              firestoreEl.textContent =
+                "Firestore: Error fetching tasks, check the console.";
+            });
         } catch (e) {
           console.error(e);
           loadEl.textContent =
