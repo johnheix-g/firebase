@@ -45,7 +45,7 @@
       initialize the SDK after all desired features are loaded, set useEmulator to false
       to avoid connecting the SDK to running emulators.
     -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <script defer src="/__/firebase/init.js"></script>
 
     <style media="screen">
       body {
@@ -143,7 +143,7 @@
         });
         const loadEl = document.querySelector("#load");
         const firestoreEl = document.querySelector("#firestore");
-
+        console.log(firebase.app().options);
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥 🔥🔥🔥
 
         // // The Firebase SDK is initialized and available here!
