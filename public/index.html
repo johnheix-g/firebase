@@ -126,15 +126,24 @@
       >
     </div>
     <p id="load">Firebase SDK Loading&hellip;</p>
+    <button id="loginBtn">Login</button>
     <p id="firestore">Firestore</p>
 
     <script>
-      import { getAuth } from "firebase/auth";
-      const auth = getAuth();
-      const user = auth.currentUser;
-      const token = user ? await user.getIdToken() : null;
       document.addEventListener("DOMContentLoaded", function () {
+        const loginBtn = document.getElementById("loginBtn");
+        loginBtn.addEventListener("click", async () => {
+          try {
+            const userCredential = await firebase
+              .auth()
+              .signInWithEmailAndPassword("test@abcde.com", "123456");
+          } catch (error) {
+            console.error("Error signing in:", error);
+          }
+        });
         const loadEl = document.querySelector("#load");
+        const firestoreEl = document.querySelector("#firestore");
+
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥 🔥🔥🔥
 
         // // The Firebase SDK is initialized and available here!
@@ -166,22 +175,31 @@
           ].filter((feature) => typeof app[feature] === "function");
           loadEl.textContent = `Firebase SDK loaded with ${features.join(", ")}`;
 
-          const firestoreEl = document.querySelector("#firestore");
-          fetch("https://task-api-108536250944.us-central1.run.app/tasks", {
-            headers: {
-              "Authorization": `Bearer ${token}`, // Replace with your actual token if needed
-              method: "GET"
+          firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) {
+              firestoreEl.textContent = `User NOT signed in:`;
+              return;
             }
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              firestoreEl.textContent = `Firestore: ${data.length} tasks found`;
+            const token = await user.getIdToken(/* forceRefresh */ true);
+            firestoreEl.textContent = `User signed in: ${user.email}`;
+
+            fetch("https://task-api-108536250944.us-central1.run.app/tasks", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json", // Replace with your actual token if needed
+              },
             })
-            .catch((error) => {
-              console.error(error);
-              firestoreEl.textContent =
-                "Firestore: Error fetching tasks, check the console.";
-            });
+              .then((response) => response.json())
+              .then((data) => {
+                firestoreEl.textContent = `Firestore: ${data.length} tasks found`;
+              })
+              .catch((error) => {
+                console.error(error);
+                firestoreEl.textContent =
+                  "Firestore: Error fetching tasks, check the console.";
+              });
+          });
         } catch (e) {
           console.error(e);
           loadEl.textContent =
